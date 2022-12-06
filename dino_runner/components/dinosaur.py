@@ -5,7 +5,7 @@ from dino_runner.utils.constants import JUMPING, RUNNING, DUCKING
 X_POS = 80
 Y_POS = 310
 JUMP_VELOCITY = 8
-Y_POS_DUCKY = 345
+Y_POS_DUCKY = 340
 class Dinosaur(Sprite):
 
     def __init__(self):
@@ -39,9 +39,8 @@ class Dinosaur(Sprite):
 
         if user_input[pygame.K_DOWN] and not self.dino_jump:
             self.dino_duck = True
-            self.dino_jump = False
             self.dino_run = False      
-        elif not self.dino_jump:
+        elif not self.dino_jump or self.dino_duck:
             self.dino_duck = False
             self.dino_jump = False
             self.dino_run = True
@@ -71,13 +70,13 @@ class Dinosaur(Sprite):
         self.step_index +=1
 
     def crouch (self):
-        self.dino_rect = DUCKING
+        self.dino_rect = self.image.get_rect()
         self.dino_rect.x = X_POS
         self.dino_rect.y = Y_POS_DUCKY
         if self.step_index > 5:
-            self.image = DUCKING[1]
-        else:
             self.image = DUCKING[0]
+        else:
+            self.image = DUCKING[1]
         self.step_index +=1
  
 
