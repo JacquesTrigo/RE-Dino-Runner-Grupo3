@@ -2,9 +2,13 @@ import pygame
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.obstacles.cactus import Cactus
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
+from dino_runner.components.obstacles.shield import Shield
+from dino_runner.components.powerups.power_up_manager import PowerUpManager
 from dino_runner.components.score import Score
-from dino_runner.utils.constants import BG, FONT_STYLE, ICON, RUNNING, SCREEN_HEIGHT, SCREEN_WIDTH,SMALL_CACTUS, TITLE, FPS
+from dino_runner.utils.constants import BG, DEFAULT_TYPE, FONT_STYLE, ICON, RUNNING, SCREEN_HEIGHT, SCREEN_WIDTH, SHIELD_TYPE, SMALL_CACTUS, TITLE, FPS
 from dino_runner.components import text_utils
+from pygame import mixer
+
 
 class Game:
     def __init__(self):
@@ -23,6 +27,8 @@ class Game:
 
         self.death_count = 0
         self.score = Score()
+        self.power_up_manager = PowerUpManager()
+
 
     def execute(self):
         self.executing = True
@@ -31,20 +37,19 @@ class Game:
             if not self.playing:
                 self.show_menu()
 
-        pygame.quit()
-
     def run(self):
         # Game loop: events - update - draw
         self.playing = True
         self.obstacle_manager.reset_obstacles()
         self.score.reset()
         self.game_speed = 20
+        self.power_up_manager.reset_power_ups()
+
         while self.playing:
             self.events()
             self.update()
             self.draw()
-        pygame.quit()
-
+        pygame.quit
 
     def events(self):
         for event in pygame.event.get():
@@ -66,7 +71,8 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.score.draw(self.screen)
-
+        self.power_up_manager.draw(self.screen)
+        self.draw_power_up_activate()
         pygame.display.update()
         pygame.display.flip()
 
@@ -122,3 +128,20 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 self.run()
 
+    def on_death (self):
+        is_invencible = self.player.type == SHIELD_TYPE
+        if not is_invencible:
+            self.playing = False
+            self.death_count += 1
+        return is_invencible
+
+    def draw_power_up_activate (self):
+
+        if self.player.has_power_up:
+            time_to_show = round ((self.player.power_up_time_up - pygame.time.get_ticks())) / 1000
+            if time_to_show >= 0:
+                pass
+                #pantalla
+            else:
+                self.player.has_power_up = False
+                self.player.type = DEFAULT_TYPE
